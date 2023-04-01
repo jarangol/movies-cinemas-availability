@@ -7,25 +7,33 @@ app = Flask(__name__)
 def index():
   return 'Web App with Python Flask!'
 
-@app.route('/cinemas')
+@app.route('/cinemas', methods=['GET'])
 def getCinemas():
   url = "http://159.122.183.100:32341/api/v1.0/films/"
   response = requests.get(url)
   movies_json = response.json()
-  cinemas = {}
+  cinemas = []
+  added_cinemas = set()
+
   for movie in movies_json:
     for cinema in movie['cines']:
-      cinema_id = cinema['id']
-      if (cinema_id not in cinemas):
-        cinemas[cinema_id] = {
-          'name': cinema['name'],
-          'id': cinema_id,
-          'address': cinema['adress'],
-          'movies': [movie]
-        }
-      else:
-        cinemas[cinema_id]['movies'].append(movie)
-
+      if (cinema['id'] not in added_cinemas):
+        added_cinemas.add(cinema['id'])
+        cinemas.append(cinema)
   return cinemas
+
+@app.route('/cinemas/<id>', methods=['GET'])
+def getCinemaMovies(id):
+  url = "http://159.122.183.100:32341/api/v1.0/films/"
+  response = requests.get(url)
+  movies_json = response.json()
+  cinema_movies = []
+  for movie in movies_json:
+    for cinema in movie['cines']:
+
+      if (cinema['id'] == int(id)):
+        cinema_movies.append(movie)
+  return cinema_movies
+
 
 app.run(host='0.0.0.0', port=3080)
