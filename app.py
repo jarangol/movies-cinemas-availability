@@ -1,7 +1,9 @@
 from flask import Flask
+from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
@@ -22,7 +24,7 @@ def getCinemas():
         cinemas.append(cinema)
   return cinemas
 
-@app.route('/cinemas/<id>', methods=['GET'])
+@app.route('/cinemas/<id>/movies', methods=['GET'])
 def getCinemaMovies(id):
   url = "http://159.122.183.100:32341/api/v1.0/films/"
   response = requests.get(url)
@@ -30,10 +32,8 @@ def getCinemaMovies(id):
   cinema_movies = []
   for movie in movies_json:
     for cinema in movie['cines']:
-
       if (cinema['id'] == int(id)):
         cinema_movies.append(movie)
   return cinema_movies
-
 
 app.run(host='0.0.0.0', port=3080)
